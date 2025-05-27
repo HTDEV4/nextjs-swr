@@ -29,3 +29,14 @@
 - Trường hợp không global thì khỏi xài key.
 
 - Những trường hợp bị lỗi có thể là lỗi `map`, `key`.
+
+## Conditional data fetching
+
+- Xử lí tình huống mà mình muốn xử lí th swr theo điều kiện mà mình muốn
+
+- TH1:
+  - Sử dụng null trong key thì nó sẽ kh `fetch` và nó sẽ bỏ qua.
+- TH2:
+  - Tạo ra hàm trả về falsy.
+- TH3:
+  - Hàm xảy ra lỗi thì nó cũng sẽ bỏ qua và không fetch.
