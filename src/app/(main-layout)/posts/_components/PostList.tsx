@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import useSWR, { mutate } from "swr";
+import PostAdd from "./PostAdd";
 const getPosts = async () => {
     const response = await fetch("http://localhost:3001/posts");
     if (!response.ok) {
@@ -54,25 +55,39 @@ export default function PostList() {
     }
 
     return (
-        <div>
-            <h1>Post List</h1>
-            <button
-                onClick={handleReload}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 ml-1"
-            >
-                Reload
-            </button>
-            {
-                posts.map((post: { id: number; title: string; body: string }) => (
-                    <div key={post.id}>
-                        <h2 className="font-bold">
-                            <Link href={`/posts/${post.id}`} className="text-blue-500 hover:underline">
+        <div className="max-w-4xl mx-auto mt-10 p-4">
+            {/* Title + Reload Button */}
+            <div className="flex items-center justify-between mb-6">
+                <h1 className="text-3xl font-bold text-gray-800">Post List</h1>
+                <button
+                    onClick={handleReload}
+                    className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 shadow-md transition duration-200"
+                >
+                    Reload
+                </button>
+            </div>
+
+            {/* Post Items */}
+            <div className="space-y-4 mb-10">
+                {posts.map((post: { id: number; title: string; body: string }) => (
+                    <div
+                        key={post.id}
+                        className="bg-white p-4 rounded-xl shadow hover:shadow-md transition"
+                    >
+                        <h2 className="text-xl font-semibold text-gray-700">
+                            <Link
+                                href={`/posts/${post.id}`}
+                                className="text-blue-500 hover:underline"
+                            >
                                 {post.title}
                             </Link>
                         </h2>
                     </div>
-                ))
-            }
+                ))}
+            </div>
+
+            {/* Add Post Form */}
+            <PostAdd />
         </div>
     );
 }

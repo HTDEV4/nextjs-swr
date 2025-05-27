@@ -21,9 +21,11 @@
 - Xử lí th này ở client.
 - SWR sẽ cho người dùng dữ liệu mới nhất khi fetch bị trễ và nó sẽ tự động revalidate luôn.
 
-## Mutation
+## Mutation & Revalidation
 
 - Khi bạn có sự thay đổi nào đó bên phía API mà bạn mún cập nhật lại giao diện thì dùng mutation.
 - Trường hợp sử dụng mutation global là cho trường hợp tách components.
   - Phải xác định được `key` khi sử dụng global.
 - Trường hợp không global thì khỏi xài key.
+
+- Những trường hợp bị lỗi có thể là lỗi `map`, `key`.
