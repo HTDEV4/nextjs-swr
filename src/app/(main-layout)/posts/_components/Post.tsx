@@ -1,7 +1,7 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 interface CustomError extends Error {
@@ -18,7 +18,7 @@ const getPost = async ({ id, token }: {
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+    const response = await fetch(`http://localhost:3001/posts/${id}`, {
         headers,
     });
     if (response.status === 404) {
