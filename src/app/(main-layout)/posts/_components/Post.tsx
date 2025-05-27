@@ -1,6 +1,7 @@
 "use client";
 
 import { notFound } from "next/navigation";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 interface CustomError extends Error {
@@ -8,8 +9,18 @@ interface CustomError extends Error {
     message: string;
 }
 
-const getPost = async (id: string) => {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+const getPost = async ({ id, token }: {
+    id: string;
+    token?: string;
+}) => {
+    // Check token 
+    const headers: HeadersInit = {};
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+        headers,
+    });
     if (response.status === 404) {
         const error: CustomError = new Error("Post not found");
         error.status = response.status;
@@ -22,18 +33,26 @@ const getPost = async (id: string) => {
 }
 
 export default function Post({ id }: { id: string }) {
-    // Kiểm soát tốt hơn thì kh cho truyền tự động id vào
-    // Đặt key để thuận tiện cho bài toán mutation, revalidate, v.v.
-    const { data, isLoading, error } = useSWR(`/posts/${id}`, () => getPost(id));
+    // Đây là trường hợp lấy token từ localStorage nhưng mà nó sẽ bị lỗi khi build
+    // Cách xử lí trường hợp này là sử dụng useEffect 
+    // const [token, setToken] = useState<string>("");
+
+    const { data, isLoading, error } = useSWR(`/posts/${id}`, () => {
+        const token = localStorage.getItem("token") ?? "";
+        return getPost({ id, token });
+    });
+
+    // useEffect(() => {
+    //     const token = localStorage.getItem("token") ?? "";
+    //     setToken(token);
+    // }, [])
 
     if (isLoading) {
         return <h2 className="font-bold">Loading...</h2>;
     }
-
     if (error?.status === 404) {
         notFound();
     }
-
     if (error) {
         return <h2 className="font-bold text-red-600">Error: {error.message}</h2>;
     }
