@@ -23,7 +23,7 @@
 
 ## Mutation & Revalidation
 
-- Khi bạn có sự thay đổi nào đó bên phía API mà bạn mún cập nhật lại giao diện thì dùng mutation.
+- SWR cho phép bạn cập nhật dữ liệu trong cache mà không cần gửi lại yêu cầu API.
 - Trường hợp sử dụng mutation global là cho trường hợp tách components.
   - Phải xác định được `key` khi sử dụng global.
 - Trường hợp không global thì khỏi xài key.

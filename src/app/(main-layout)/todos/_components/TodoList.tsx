@@ -22,6 +22,7 @@ const getTodoDetail = async (id: number) => {
 export default function TodoList() {
 
     // Xử state này để xử lí th todoDetail.
+    // - todoId: Để lấy th todo detail ra  
     const [todoId, setTodoId] = useState(0);
 
     const { data, isLoading, error } = useSWR("/todos", getTodoList);
