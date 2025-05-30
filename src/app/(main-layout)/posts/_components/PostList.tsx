@@ -20,7 +20,7 @@ export default function PostList() {
         // mutate,
     } = useSWR("/posts", getPosts, {
         fallbackData: [],
-        revalidateOnFocus: false, // Kh nên tắt
+        // revalidateOnFocus: false, // Kh nên tắt
         // refreshInterval: 1000, // Tránh sử dụng th này bởi vì nó sẽ gây nặng cho cả 2 phía trình duyệt hoặc server.
     });
 

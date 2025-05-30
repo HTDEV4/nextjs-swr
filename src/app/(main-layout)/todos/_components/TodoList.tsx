@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
+import SearchForm from "./SearchForm";
+import { useSearchParams } from "next/navigation";
 
-const getTodoList = async () => {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/todos`);
+const getTodoList = async (search: string = "") => {
+    const response = await fetch(`https://jsonplaceholder.typicode.com/todos?q=${search}`);
     if (!response.ok) {
         throw new Error("Failed to fetch data");
     }
@@ -21,11 +23,16 @@ const getTodoDetail = async (id: number) => {
 
 export default function TodoList() {
 
+    // Xử lí search
+    // Khi search thay đổi thì phải thêm state vô cho nó, và search nó sẽ phụ thuộc getTodoList
+    const searchParams = useSearchParams();
+    const search = searchParams.get("search") ?? "";
+
     // Xử state này để xử lí th todoDetail.
     // - todoId: Để lấy th todo detail ra  
     const [todoId, setTodoId] = useState(0);
 
-    const { data, isLoading, error } = useSWR("/todos", getTodoList);
+    const { data, isLoading, error, mutate } = useSWR("/todos", () => getTodoList(search));
     const { data: todoDetail, isLoading: loadingDetail } = useSWR(todoId ? `/todos/${todoId}` : null,
         () => getTodoDetail(todoId)
     );
@@ -33,6 +40,10 @@ export default function TodoList() {
     const handleClick = (id: number) => {
         setTodoId(id);
     }
+
+    useEffect(() => {
+        mutate();
+    }, [search, mutate]);
 
     if (isLoading) {
         return <h2 className="font-bold">Loading...</h2>
@@ -49,7 +60,7 @@ export default function TodoList() {
     return (
         <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-2xl shadow-lg">
             <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">Todo List</h1>
-
+            <SearchForm />
             <div className="space-y-4">
                 {data?.map((todo: { id: number; title: string }) => (
                     <div
