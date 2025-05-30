@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import SearchForm from "./SearchForm";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // >>>> Chức năng phân trang (Pagination)
 const LIMIT = 5;
@@ -33,11 +32,15 @@ export default function TodoList() {
     // Tổng số bản ghi lấy từ API. Lưu ý đó là cái response ở getTodoList
     const [currentPage, setCurrentPage] = useState<number>(1); // Mặc định của nó là 1
     const [totalPage, setTotalPage] = useState<number>(0);
+    // Tối ưu phân trang đẩy lên params cho biết mình đang ở trang thứ mấy
+    const router = useRouter();
 
     // Xử lí search
     // Khi search thay đổi thì phải thêm state vô cho nó, và search nó sẽ phụ thuộc getTodoList
     const searchParams = useSearchParams();
     const search = searchParams.get("search") ?? "";
+    // Để lưu số trang trên Url
+    const pageFromUrl = searchParams.get("page");
 
     // Xử state này để xử lí th todoDetail.
     // - todoId: Để lấy th todo detail ra  
@@ -45,7 +48,7 @@ export default function TodoList() {
     // currentPage là 1 dạng option có Page bởi sau này chúng ta sẽ giải quyết bài toán revalidate ở trong 1 Page thôi.
     // Tránh việc nó call lại từ đầu.
     // Chú ý cái key nếu nó tĩnh phải thay đổi key thành động. Nếu muốn xử lí key tĩnh thì phải mutate
-    const { data, isLoading, error, mutate } = useSWR("/todos?page=" + currentPage,
+    const { data, isLoading, error } = useSWR(`/todos?search=${search}&page=${currentPage}`,
         async () => {
             const { data, count } = await getTodoList(search, currentPage);
             setTotalPage(Math.ceil(Number(count) / LIMIT));
@@ -61,10 +64,21 @@ export default function TodoList() {
         setTodoId(id);
     }
 
-    // Cập nhật search
+    // Tối ưu phân trang
     useEffect(() => {
-        mutate();
-    }, [search, mutate]);
+        if (currentPage > 1) {
+            router.push(`/todos?page=${currentPage}`);
+        } else {
+            if (!search) {
+                router.push(`/todos`);
+            }
+        }
+    }, [currentPage, router, search]);
+
+    // Lưu số trang lên url
+    useEffect(() => {
+        setCurrentPage(Number(pageFromUrl) || 1);
+    }, [pageFromUrl])
 
     if (isLoading) {
         return (
@@ -96,7 +110,6 @@ export default function TodoList() {
         );
     }
 
-
     if (error) {
         return <h2 className="font-bold">Error: {error.message}</h2>
     }
@@ -108,9 +121,8 @@ export default function TodoList() {
 
     return (
         <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-2xl shadow-lg">
-            <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">Todo List</h1>
-            <SearchForm />
             <div className="space-y-4">
+                <h1 className="font-bold">Current Page: {currentPage}</h1>
                 {data?.map((todo: { id: number; title: string }) => (
                     <div
                         key={todo.id}

@@ -1,15 +1,19 @@
 "use client";
 
 import { debounce } from "@/app/utils/debounce";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-
-
 export default function SearchForm() {
-
     const [search, setSearch] = useState<string>("");
+    const searchParams = useSearchParams();
+    const searchFromUrl = searchParams.get("search") ?? "";
     const router = useRouter();
+
+    useEffect(() => {
+        setSearch(searchFromUrl);
+    }, [searchFromUrl])
+
     useEffect(() => {
         if (search === "") {
             router.push(`/todos`)
@@ -26,6 +30,7 @@ export default function SearchForm() {
                     placeholder="Search..."
                     className="w-full px-4 py-2 pl-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
                     onChange={debounce((e) => (setSearch(e.target.value), 500))}
+                    defaultValue={search}
                 />
                 <svg
                     className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"

@@ -77,3 +77,5 @@
 - Ví dụ: \_limit=3&\_page=1 thì trang 1 có 3 dữ liệu
 
 - Khi phân trang chú ý cái `key` của SWR là phải động. Còn kh xử lí lại thành động thì phải mutate.
+
+- `Tối ưu phân trang`: đẩy nó lên params nữa là oke.
