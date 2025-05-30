@@ -40,3 +40,32 @@
   - Tạo ra hàm trả về falsy.
 - TH3:
   - Hàm xảy ra lỗi thì nó cũng sẽ bỏ qua và không fetch.
+
+## Automatic Revalidation
+
+- `Revalidate on focus:` Khi mà người dùng focus vào component lập tức refresh lại. Nghĩa là nó sẽ lập tức call API và trả lại kết quả mới. Không nên tắt tính năng này đi
+- `Refetch Interval:` Thiết lập thời gian trong bao lâu thì nó sẽ gửi yêu cầu. Thằng này nó liên quan tới http short polling. **Lưu ý** th này hạn chế sử dụng.
+  - `Short Polling:` Client gửi request → Server trả kết quả ngay lập tức (có hoặc không có dữ liệu) → Client tiếp tục gửi request sau mỗi khoảng thời gian (ví dụ: 3s, 5s...).
+    - `Ưu điểm:`
+      - Dễ cài đặt (chỉ cần setInterval).
+      - Phù hợp cho dữ liệu thay đổi không quá nhanh.
+    - `Nhược điểm:`
+      - Gửi request liên tục → tốn tài nguyên
+      - Có thể nhận dữ liệu trễ (giữa 2 lần poll)
+      - Lãng phí nếu server không có dữ liệu mới
+    - `Ứng dụng thực tế:` Dashboard thống kê đơn giản, Kiểm tra trạng thái xử lý đơn hàng, Auto refresh comment sau vài giây
+  - `Long Polling:` Client gửi request → Server giữ kết nối chờ dữ liệu có sẵn → nếu có thì trả về → client lập tức gửi request tiếp.
+    - `Ưu điểm:`
+      - Gửi ít request hơn (tiết kiệm)
+      - Gần giống real-time (ít trễ hơn short polling).
+      - Không cần WebSocket vẫn làm được gần real-time
+    - `Nhược điểm:`
+      - Phức tạp hơn Short Polling
+      - Cần xử lý timeout, retry logic
+      - Tốn tài nguyên server khi giữ kết nối nhiều
+    - `Ứng dụng thực tế:` Thông báo (notification) thời gian thực, Tin nhắn chat realtime (Telegram web, Facebook chat thời đầu), Cập nhật tiến trình xử lý dữ liệu dài
+- `Revalidate on Reconnect`: Thằng này dựa vào mạng của mình. Nghĩa là khi mình bị mất wifi sau khi phục hồi nó sẽ gửi refresh mới.
+  **Chú ý**: 3 thằng này sử dụng khá nhiều trong thực tế.
+  - refreshInterval: Hạn chế xài.
+  - revalidateOnFocus với revalidateOnReconnect: Thì luôn để mặc định đi.
+- Muốn cập nhật real-time giữa server và client liên tục thì xài Socket.

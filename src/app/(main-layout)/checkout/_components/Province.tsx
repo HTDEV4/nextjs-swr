@@ -68,7 +68,7 @@ export default function Province() {
     } = useSWR(districtId ? `/ward/${districtId}` : null, () => getWard(districtId), {  // vì () => getDistrict(provinceId) nó tự pass params từ key sang
         fallbackData: fallbackDataDefault
     });
-    console.log(ward);
+
     return (
         <div >
             <div>

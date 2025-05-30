@@ -20,19 +20,12 @@ export default function PostList() {
         // mutate,
     } = useSWR("/posts", getPosts, {
         fallbackData: [],
+        revalidateOnFocus: false, // Kh nên tắt
+        // refreshInterval: 1000, // Tránh sử dụng th này bởi vì nó sẽ gây nặng cho cả 2 phía trình duyệt hoặc server.
     });
 
     const handleReload = () => {
-        // Mutate: Nếu trên server có thay đổi thì sẽ lấy lại dữ liệu mới
-        // Nó sẽ call lại API để lấy dữ liệu mới
-        // mutate((data: { id: number; title: string; body: string }[]) => {
-        //     // data này là data gốc 
-        //     // Giữ nguyên dữ liệu cũ trong khi đang fetch dữ liệu mới
-        //     return [...data, { id: 4, title: "New Post", body: "This is a new post" }];
-        // }, {
-        //     revalidate: false,
-        // });
-        // Nhớ phải trùng keyyyyy, cái gì quan trọng thì phải nói 3 lần
+
         mutate("/posts",
             (data: { id: number; title: string; body: string }[] | undefined) => {
                 if (data) {

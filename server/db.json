@@ -6,34 +6,14 @@
       "body": "Body 1"
     },
     {
-      "id": 2,
       "title": "Post 2",
-      "body": "Body 2"
+      "body": "Content 2",
+      "id": 2
     },
     {
-      "id": 3,
       "title": "Post 3",
-      "body": "Body 3"
-    },
-    {
-      "title": "post 4",
-      "body": "ahihi",
-      "id": 4
-    },
-    {
-      "title": "Post 5",
-      "body": "Content 4",
-      "id": 5
-    },
-    {
-      "title": "Post 6",
-      "body": "Content 6",
-      "id": 6
-    },
-    {
-      "title": "Post 7",
-      "body": "Content 7",
-      "id": 7
+      "body": "Content 3",
+      "id": 3
     }
   ]
 }
