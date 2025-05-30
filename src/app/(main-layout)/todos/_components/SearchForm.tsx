@@ -11,7 +11,6 @@ export default function SearchForm() {
     const [search, setSearch] = useState<string>("");
     const router = useRouter();
     useEffect(() => {
-
         if (search === "") {
             router.push(`/todos`)
         } else {

@@ -5,12 +5,18 @@ import useSWR from "swr";
 import SearchForm from "./SearchForm";
 import { useSearchParams } from "next/navigation";
 
-const getTodoList = async (search: string = "") => {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/todos?q=${search}`);
+// >>>> Chức năng phân trang (Pagination)
+const LIMIT = 5;
+
+const getTodoList = async (search: string = "", page: number = 1) => {
+    const response = await fetch(`https://jsonplaceholder.typicode.com/todos?q=${search}&_page=${page}&_limit=${LIMIT}`);
     if (!response.ok) {
         throw new Error("Failed to fetch data");
     }
-    return response.json();
+    // >>> Xử lí phân trang
+    const data = await response.json();
+    const count = response.headers.get("x-total-count");
+    return { data, count };
 };
 
 const getTodoDetail = async (id: number) => {
@@ -22,6 +28,11 @@ const getTodoDetail = async (id: number) => {
 }
 
 export default function TodoList() {
+    // >>>> Chức năng phân trang.
+    // Tính tổng số trang
+    // Tổng số bản ghi lấy từ API. Lưu ý đó là cái response ở getTodoList
+    const [currentPage, setCurrentPage] = useState<number>(1); // Mặc định của nó là 1
+    const [totalPage, setTotalPage] = useState<number>(0);
 
     // Xử lí search
     // Khi search thay đổi thì phải thêm state vô cho nó, và search nó sẽ phụ thuộc getTodoList
@@ -31,8 +42,17 @@ export default function TodoList() {
     // Xử state này để xử lí th todoDetail.
     // - todoId: Để lấy th todo detail ra  
     const [todoId, setTodoId] = useState(0);
+    // currentPage là 1 dạng option có Page bởi sau này chúng ta sẽ giải quyết bài toán revalidate ở trong 1 Page thôi.
+    // Tránh việc nó call lại từ đầu.
+    // Chú ý cái key nếu nó tĩnh phải thay đổi key thành động. Nếu muốn xử lí key tĩnh thì phải mutate
+    const { data, isLoading, error, mutate } = useSWR("/todos?page=" + currentPage,
+        async () => {
+            const { data, count } = await getTodoList(search, currentPage);
+            setTotalPage(Math.ceil(Number(count) / LIMIT));
+            return data;
+        }
+    );
 
-    const { data, isLoading, error, mutate } = useSWR("/todos", () => getTodoList(search));
     const { data: todoDetail, isLoading: loadingDetail } = useSWR(todoId ? `/todos/${todoId}` : null,
         () => getTodoDetail(todoId)
     );
@@ -41,13 +61,42 @@ export default function TodoList() {
         setTodoId(id);
     }
 
+    // Cập nhật search
     useEffect(() => {
         mutate();
     }, [search, mutate]);
 
     if (isLoading) {
-        return <h2 className="font-bold">Loading...</h2>
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+                <div className="flex items-center space-x-3">
+                    <svg
+                        className="animate-spin h-8 w-8 text-blue-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                        />
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                    </svg>
+                    <h2 className="text-xl font-bold text-blue-600">Loading...</h2>
+                </div>
+            </div>
+        );
     }
+
+
     if (error) {
         return <h2 className="font-bold">Error: {error.message}</h2>
     }
@@ -81,6 +130,22 @@ export default function TodoList() {
                         }
                     </div>
                 ))}
+                <div className="flex justify-between gap-4 mt-6">
+                    <button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1} // Phân trang nhớ có thằng này
+                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                        Prev
+                    </button>
+                    <button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage === totalPage}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
         </div>
     );

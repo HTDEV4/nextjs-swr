@@ -69,3 +69,11 @@
   - refreshInterval: Hạn chế xài.
   - revalidateOnFocus với revalidateOnReconnect: Thì luôn để mặc định đi.
 - Muốn cập nhật real-time giữa server và client liên tục thì xài Socket.
+
+## Pagination
+
+- \_limit: có bao nhiêu dữ liệu trong 1 trang.
+- \_page: Số trang
+- Ví dụ: \_limit=3&\_page=1 thì trang 1 có 3 dữ liệu
+
+- Khi phân trang chú ý cái `key` của SWR là phải động. Còn kh xử lí lại thành động thì phải mutate.
