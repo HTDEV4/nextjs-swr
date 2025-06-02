@@ -66,12 +66,10 @@ export default function TodoList() {
 
     // Tối ưu phân trang
     useEffect(() => {
-        if (currentPage > 1) {
-            router.push(`/todos?page=${currentPage}`);
+        if (Number(currentPage) === 1 && !search) {
+            router.push(`/todos`);
         } else {
-            if (!search) {
-                router.push(`/todos`);
-            }
+            router.push(`/todos?page=${currentPage}&search=${search}`);
         }
     }, [currentPage, router, search]);
 
@@ -122,7 +120,7 @@ export default function TodoList() {
     return (
         <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-2xl shadow-lg">
             <div className="space-y-4">
-                <h1 className="font-bold">Current Page: {currentPage}</h1>
+                <h1 className="font-bold">Current Page: {currentPage} / {totalPage}</h1>
                 {data?.map((todo: { id: number; title: string }) => (
                     <div
                         key={todo.id}

@@ -15,12 +15,8 @@ export default function SearchForm() {
     }, [searchFromUrl])
 
     useEffect(() => {
-        if (search === "") {
-            router.push(`/todos`)
-        } else {
-            router.push(`/todos?search=${search}`)
-        }
-    }, [search, router]);
+        router.push(`/todos?search=${search}`)
+    }, [search, router, searchFromUrl]);
 
     return (
         <div className="w-full max-w-md mx-auto mt-6 mb-3">
